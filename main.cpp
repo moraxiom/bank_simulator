@@ -17,6 +17,72 @@ struct Compte
 };
 /* STRUCT */
 
+/* AFFICHAGE */
+void AfficherAideConnexion()
+{
+	cout << "===============================================" << endl;
+	cout << "|             VEUILLEZ REESSAYER!             |" << endl;
+	cout << "===============================================" << endl;
+	cout << endl;
+	cout << " Votre # de compte et/ou votre NIP est" << endl;
+	cout << " introuvable!" << endl;
+	cout << endl;
+	cout << " OU" << endl;
+	cout << " Votre NIP ne correspond pas au NIP de" << endl;
+	cout << " votre compte!" << endl;
+	cout << endl;
+}
+
+void AfficherAideFormat()
+{
+	cout << "===============================================" << endl;
+	cout << "|             VEUILLEZ REESSAYER!             |" << endl;
+	cout << "===============================================" << endl;
+	cout << endl;
+	cout << " Votre # de compte et/ou votre NIP ne" << endl;
+	cout << " correspond pas au  bon format!" << endl;
+	cout << endl;
+	cout << " # : 6 CHIFFRES" << endl;
+	cout << " NIP : 5 CHIFFRES" << endl;
+	cout << endl;
+}
+
+void AfficherBarreConnexion()
+{
+	cout << "===============================================" << endl;
+	cout << "|                CONNEXION...                 |" << endl;
+	cout << "===============================================" << endl;
+	cout << endl;
+}
+
+void AfficherBarreValidation()
+{
+	cout << endl;
+	cout << "===============================================" << endl;
+	cout << "|            VALIDATION EN COURS...           |" << endl;
+	cout << "===============================================" << endl;
+	cout << endl;
+	cout << endl;
+	system("pause");
+	system("cls");
+}
+
+void AfficherMenu()
+{
+	cout << "===============================================" << endl;
+	cout << "|                BANQUE SNYDER                |" << endl;
+	cout << "===============================================" << endl;
+	cout << endl;
+	cout << " [1] - Afficher le solde du compte" << endl;
+	cout << " [2] - Effectuer un retrait" << endl;
+	cout << " [3] - Deposer une somme d'argent" << endl;
+	cout << " [4] - Transfert vers un autre compte" << endl;
+	cout << " [5] - Voir l'historique des transactions" << endl;
+	cout << " [6] - QUITTER" << endl;
+	cout << endl;
+}
+/* AFFICHAGE */
+
 /* INT */
 int Taille()
 {
@@ -82,15 +148,18 @@ int RechercherCompte(int size, int& inputNC, int& inputNIP, Compte infostableau[
 }
 /* INT */
 
+int CompterChiffres()
+{
+
+}
+
 /* BOOL */
-/*
 bool ValiderInput(int size, int indice, int& inputNC, int& inputNIP, Compte infostableau[])
 {
 	return true;
 }
-*/
 
-bool ValiderInformations(int size, int indice, int& inputNC, int& inputNIP, Compte infostableau[])
+bool ValiderInformations(int indice, int& inputNIP, Compte infostableau[])
 {
 	if (indice == -1)
 	{
@@ -108,74 +177,29 @@ bool ValiderInformations(int size, int indice, int& inputNC, int& inputNIP, Comp
 		}
 	}
 }
+
+bool ConnecterJoueur(int size, int indice, int& inputNC, int& inputNIP, Compte infostableau[])
+{
+	indice = RechercherCompte(size, inputNC, inputNIP, infostableau);
+	bool b1{ ValiderInput(size, indice, inputNC, inputNIP, infostableau) };
+	bool b2{ ValiderInformations(indice, inputNIP, infostableau) };
+
+	if (b1 == false)
+	{
+		AfficherAideFormat();
+		return false;
+	}
+	else if (b2 == false)
+	{
+		AfficherAideConnexion();
+		return false;
+	}
+	else
+	{ 
+		return true;
+	}
+}
 /* BOOL */
-
-/*
-void AfficherAideFormat()
-{
-	cout << "===============================================" << endl;
-	cout << "|             VEUILLEZ REESSAYER!             |" << endl;
-	cout << "===============================================" << endl;
-	cout << endl;
-	cout << " Votre # de compte et/ou votre NIP ne" << endl;
-	cout << " correspond pas au  bon format!" << endl;
-	cout << endl;
-	cout << " # : 6 CHIFFRES" << endl;
-	cout << " NIP : 5 CHIFFRES" << endl;
-	cout << endl;
-}
-*/
-
-/* AFFICHAGE */
-void AfficherAideConnexion()
-{
-	cout << "===============================================" << endl;
-	cout << "|             VEUILLEZ REESSAYER!             |" << endl;
-	cout << "===============================================" << endl;
-	cout << endl;
-	cout << " Votre # de compte et/ou votre NIP est" << endl;
-	cout << " introuvable!" << endl;
-	cout << endl;
-	cout << " OU" << endl;
-	cout << " Votre NIP ne correspond pas au NIP de" << endl;
-	cout << " votre compte!" << endl;
-	cout << endl;
-}
-
-void AfficherBarreConnexion()
-{
-	cout << "===============================================" << endl;
-	cout << "|                CONNEXION...                 |" << endl;
-	cout << "===============================================" << endl;
-	cout << endl;
-}
-
-void AfficherBarreValidation()
-{
-	cout << endl;
-	cout << "===============================================" << endl;
-	cout << "|            VALIDATION EN COURS...           |" << endl;
-	cout << "===============================================" << endl;
-	cout << endl;
-	cout << endl;
-	system("pause");
-	system("cls");
-}
-
-void AfficherMenu()
-{
-	cout << "===============================================" << endl;
-	cout << "|                BANQUE SNYDER                |" << endl;
-	cout << "===============================================" << endl;
-	cout << endl;
-	cout << " [1] - Afficher le solde du compte" << endl;
-	cout << " [2] - Effectuer un retrait" << endl;
-	cout << " [3] - Deposer une somme d'argent" << endl;
-	cout << " [4] - Voir l'historique des transactions" << endl;
-	cout << " [5] - QUITTER" << endl;
-	cout << endl;
-}
-/* AFFICHAGE */
 
 int main()
 {
@@ -183,6 +207,7 @@ int main()
 
 	ifstream fichier{ "informations.txt" };
 	Compte infostableau[MAX]{};
+
 	int inputNC{ 0 };
 	int inputNIP{ 0 };
 	int size{ Taille() };
@@ -198,18 +223,17 @@ int main()
 		AfficherBarreValidation();
 
 		CreerTableau(size, infostableau);
-		indice = (RechercherCompte(size, inputNC, inputNIP, infostableau));
-
-		if (ValiderInformations(size, indice, inputNC, inputNIP, infostableau) == false)
-		{
-			AfficherAideConnexion();
-			system("pause");
-		}
-		else
-		{
-			AfficherMenu();
-		}
+		ConnecterJoueur(size, indice, inputNC, inputNIP, infostableau);
 	}
-	while (false);
+	while (ConnecterJoueur(size, indice, inputNC, inputNIP, infostableau) == false);
+
+	AfficherMenu();
+	int choix{ };
+	cin >> choix;
+
+	switch (choix)
+	{
+	}
+
 	return 0;
 }
