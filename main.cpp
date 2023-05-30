@@ -4,18 +4,20 @@
 #include <string>
 
 using namespace std;
-
 const int MAX{ 100 };
 
+/* STRUCT */
 struct Compte
 {
 	string prenom{ "" };
 	string nom{ "" };
 	int nCompte{ 0 };
 	int nip{ 0 };
-	int solde{ 0 };
+	float solde{ 0 };
 };
+/* STRUCT */
 
+/* INT */
 int Taille()
 {
 	ifstream fichier("informations.txt");
@@ -27,7 +29,7 @@ int Taille()
 	{
 		string ligne{ };
 		int i{ 0 };
-		for (i; !fichier.is_open(); i++)
+		for (i; !fichier.eof(); i++)
 		{
 			getline(fichier, ligne);
 		}
@@ -35,114 +37,179 @@ int Taille()
 	}
 }
 
-int CreerTableau(int taille, Compte infostableau[])
+int CreerTableau(int size, Compte infostableau[])
 {
 	ifstream fichier("informations.txt");
 	if (!fichier.is_open())
 	{
 		return -1;
 	}
-	else
+	else if (fichier.is_open())
 	{
 		Compte infos{};
-		for (int i{ 0 }; i < taille; i++)
+		for (int i{ 0 }; i < size; i++)
 		{
 			fichier >> infos.prenom >> infos.nom >> infos.nCompte >> infos.nip >> infos.solde;
+			infostableau[i] = infos;
 		}
 	}
 	return 0;
 }
 
-void AfficherMenu()
+int RechercherCompte(int size, int& inputNC, int& inputNIP, Compte infostableau[])
 {
-	cout << "===============================================" << endl;
-	cout << "|        BIENVENUE À LA BANQUE SNYDER!        |" << endl;
-	cout << "===============================================" << endl;
-	cout << endl;
-	cout << " [1] - Afficher le solde du compte" << endl;
-	cout << " [2] - Effectuer un retrait" << endl;
-	cout << " [3] - Effectuer un dépôt" << endl;
-	cout << " [4] - Voir l'historique des transactions" << endl;
-	cout << " [5] - QUITTER" << endl;
-	cout << endl;
-}
+	int g{ 0 };
+	int d{ size - 1 };
+	int milieu{ };
 
-void AfficherAide()
+	while (g <= d)
+	{
+		milieu = ((g + d) / 2);
+		if (infostableau[milieu].nCompte == inputNC)
+		{
+			return milieu;
+		}
+		else if (infostableau[milieu].nCompte > g)
+		{
+			g = milieu + 1;
+		}
+		else
+		{
+			d = milieu - 1;
+		}
+	}
+	return -1;
+}
+/* INT */
+
+/* BOOL */
+/*
+bool ValiderInput(int size, int indice, int& inputNC, int& inputNIP, Compte infostableau[])
+{
+	return true;
+}
+*/
+
+bool ValiderInformations(int size, int indice, int& inputNC, int& inputNIP, Compte infostableau[])
+{
+	if (indice == -1)
+	{
+		return false;
+	}
+	else
+	{
+		if (infostableau[indice].nip == inputNIP)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+}
+/* BOOL */
+
+/*
+void AfficherAideFormat()
 {
 	cout << "===============================================" << endl;
-	cout << "|                   UH-OH!                    |" << endl;
+	cout << "|             VEUILLEZ REESSAYER!             |" << endl;
 	cout << "===============================================" << endl;
 	cout << endl;
-	cout << " Votre numéro de compte et/ou votre NIP ne" << endl;
-	cout << " correspond pas au format demandé!" << endl;
+	cout << " Votre # de compte et/ou votre NIP ne" << endl;
+	cout << " correspond pas au  bon format!" << endl;
 	cout << endl;
-	cout << " NUMÉRO : 6 CHIFFRES" << endl;
+	cout << " # : 6 CHIFFRES" << endl;
 	cout << " NIP : 5 CHIFFRES" << endl;
 	cout << endl;
+}
+*/
+
+/* AFFICHAGE */
+void AfficherAideConnexion()
+{
 	cout << "===============================================" << endl;
-	cout << "|             VEUILLEZ RÉESSAYER!             |" << endl;
+	cout << "|             VEUILLEZ REESSAYER!             |" << endl;
 	cout << "===============================================" << endl;
+	cout << endl;
+	cout << " Votre # de compte et/ou votre NIP est" << endl;
+	cout << " introuvable!" << endl;
+	cout << endl;
+	cout << " OU" << endl;
+	cout << " Votre NIP ne correspond pas au NIP de" << endl;
+	cout << " votre compte!" << endl;
+	cout << endl;
 }
 
-void ObtenirInput(int inputNC, int inputNIP)
+void AfficherBarreConnexion()
 {
 	cout << "===============================================" << endl;
 	cout << "|                CONNEXION...                 |" << endl;
 	cout << "===============================================" << endl;
 	cout << endl;
-	cout << "      Numéro de compte : ";
-	cin >> inputNC;
-	cout << "      NIP : ";
-	cin >> inputNIP;
+}
+
+void AfficherBarreValidation()
+{
 	cout << endl;
 	cout << "===============================================" << endl;
 	cout << "|            VALIDATION EN COURS...           |" << endl;
 	cout << "===============================================" << endl;
 	cout << endl;
+	cout << endl;
+	system("pause");
+	system("cls");
 }
 
-bool ValiderInformations(int taille, int inputNC, int inputNIP, Compte infos[])
+void AfficherMenu()
 {
-	int g{ 0 };
-	int d{ taille - 1 };
-	int milieu{ };
-
-	int i{ 0 };
-	while (g > d)
-	{
-		milieu = ((g + d) / 2);
-		if (milieu == i)
-		{
-			return milieu;
-		}
-		else if (milieu > g)
-		{
-
-		}
-		else
-		{
-
-		}
-	}
-
-	return true;
+	cout << "===============================================" << endl;
+	cout << "|                BANQUE SNYDER                |" << endl;
+	cout << "===============================================" << endl;
+	cout << endl;
+	cout << " [1] - Afficher le solde du compte" << endl;
+	cout << " [2] - Effectuer un retrait" << endl;
+	cout << " [3] - Deposer une somme d'argent" << endl;
+	cout << " [4] - Voir l'historique des transactions" << endl;
+	cout << " [5] - QUITTER" << endl;
+	cout << endl;
 }
+/* AFFICHAGE */
 
 int main()
 {
-	setlocale(LC_ALL, "");
+	locale::global(locale("C"));
 
 	ifstream fichier{ "informations.txt" };
+	Compte infostableau[MAX]{};
 	int inputNC{ 0 };
 	int inputNIP{ 0 };
-	int taille{ Taille() };
-	Compte infostableau[MAX]{ };
+	int size{ Taille() };
+	int indice{ };
 
-	ObtenirInput(inputNC, inputNIP);
-	system("pause");
+	do
+	{
+		AfficherBarreConnexion();
+		cout << "      # de compte : ";
+		cin >> inputNC;
+		cout << "      NIP : ";
+		cin >> inputNIP;
+		AfficherBarreValidation();
 
-	CreerTableau(taille, infostableau);
-	AfficherMenu();
+		CreerTableau(size, infostableau);
+		indice = (RechercherCompte(size, inputNC, inputNIP, infostableau));
 
+		if (ValiderInformations(size, indice, inputNC, inputNIP, infostableau) == false)
+		{
+			AfficherAideConnexion();
+			system("pause");
+		}
+		else
+		{
+			AfficherMenu();
+		}
+	}
+	while (false);
 	return 0;
 }
