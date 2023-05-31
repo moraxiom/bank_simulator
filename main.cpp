@@ -1,4 +1,4 @@
-#include <iostream>
+#include <iostream> 
 #include <clocale>
 #include <fstream>
 #include <string>
@@ -8,7 +8,6 @@
 using namespace std;
 const int MAX{ 100 };
 
-/* STRUCT */
 struct Compte
 {
 	string prenom{ "" };
@@ -17,9 +16,20 @@ struct Compte
 	int nip{ 0 };
 	float solde{ 0 };
 };
-/* STRUCT */
 
-/* AFFICHAGE/TRAITEMENT */
+enum class Type
+{
+	Retrait,
+	Depot,
+	Transfert,
+};
+
+struct Transaction
+{
+	Type type{ };
+	float solde{ };
+};
+
 void AfficherAideConnexion()
 {
 	cout << "===============================================" << endl;
@@ -100,9 +110,6 @@ void AfficherSolde(int& indice, Compte infostableau[])
 	cout << endl;
 	cout << " Vous avez " << infostableau[indice].solde << "$ dans votre compte." << endl;
 	cout << endl;
-
-	system("pause");
-	system("cls");
 }
 
 void AfficherBarreRetrait()
@@ -195,8 +202,15 @@ int RechercherCompte(int size, int inputNC, Compte infostableau[])
 float EffectuerRetrait(int& indice, Compte infostableau[])
 {
 	float retrait{ 0.0f };
-	cout << " Retirer au compte : ";
-	cin >> retrait;
+	do
+	{
+		cout << " Retirer au compte : ";
+		cin >> retrait;
+		if (retrait < 0)
+		{
+			cout << "Vous ne pouvez pas retirer une somme negative." << endl;
+		}
+	} while (retrait < 0);
 
 	return (infostableau[indice].solde - retrait);
 }
@@ -204,8 +218,15 @@ float EffectuerRetrait(int& indice, Compte infostableau[])
 float EffectuerDepot(int& indice, Compte infostableau[])
 {
 	float depot{ 0.0f };
-	cout << " Ajouter au compte : ";
-	cin >> depot;
+	do
+	{
+		cout << " Ajouter au compte : ";
+		cin >> depot;
+		if (depot < 0)
+		{
+			cout << "Vous ne pouvez pas retirer une somme negative." << endl;
+		}
+	} while (depot < 0);
 
 	return (infostableau[indice].solde + depot);
 }
@@ -239,7 +260,7 @@ int TrouverIndiceReceveur(int size, int& indice, Compte infostableau[])
 	return n;
 }
 
-void EffectuerTransfert(int size, int& indice, Compte infostableau[])
+float EffectuerTransfert(int size, int& indice, Compte infostableau[])
 {
 	float nSolde{ };
 	float nSoldeRec{ };
@@ -254,16 +275,54 @@ void EffectuerTransfert(int size, int& indice, Compte infostableau[])
 	infostableau[indice].solde = nSolde;
 	nSoldeRec = (infostableau[nRec].solde + somme);
 	infostableau[nRec].solde = nSoldeRec;
+
+	return nSolde;
 }
 
-int TraiterChoix(int size, int& indice, int inputNC, int choix, Compte infostableau[])
+void AfficherHistorique(int nTransaction, Transaction historique[])
 {
-	AfficherMenu(indice, infostableau);
-	cin >> choix;
-	system("cls");
+	cout << "===============================================" << endl;
+	cout << "|         HISTORIQUE DES TRANSACTIONS         |" << endl;
+	cout << "===============================================" << endl;
+	cout << endl;
+	cout << " TYPE DE TRANSACTION			SOLDE" << endl;
+	cout << "-----------------------------------------------" << endl;
 
+	int taille{ nTransaction + 1 };
+	for (int i{ 0 }; i < taille; i++)
+	{
+		switch (historique[i].type)
+		{
+			case Type::Retrait:
+				cout << " Retrait";
+				break;
+
+			case Type::Depot:
+				cout << " Depot";
+				break;
+
+			case Type::Transfert:
+				cout << " Transfert";
+				break;
+		}
+		cout << "				";
+		cout << historique[i].solde << endl;
+	}
+}
+
+void SauvegarderDonnees(int size, Compte infostableau[])
+{
+	ofstream fichier{ "informations.txt" };
+	for (int i{ 0 }; i < size; i++)
+	{
+		fichier << infostableau[i].prenom << " " << infostableau[i].nom << " " << infostableau[i].nCompte;
+		fichier << " " << infostableau[i].nip << " " << infostableau[i].solde << endl;
+	}
+}
+
+int ExecuterOperations(int size, int& indice, int inputNC, int choix, int nTransaction, Transaction historique[], Compte infostableau[])
+{
 	float nSolde{ };
-
 	switch (choix)
 	{
 		case 1:
@@ -274,8 +333,8 @@ int TraiterChoix(int size, int& indice, int inputNC, int choix, Compte infostabl
 			AfficherBarreRetrait();
 			nSolde = EffectuerRetrait(indice, infostableau);
 			infostableau[indice].solde = nSolde;
-			system("cls");
-			AfficherSolde(indice, infostableau);
+			historique[nTransaction].type = Type::Retrait;
+			historique[nTransaction].solde = nSolde;
 			break;
 
 
@@ -283,20 +342,23 @@ int TraiterChoix(int size, int& indice, int inputNC, int choix, Compte infostabl
 			AfficherBarreDepot();
 			nSolde = EffectuerDepot(indice, infostableau);
 			infostableau[indice].solde = nSolde;
-			system("cls");
-			AfficherSolde(indice, infostableau);
+			historique[nTransaction].type = Type::Depot;
+			historique[nTransaction].solde = nSolde;
 			break;
 
 		case 4:
 			AfficherBarreTransfert();
-			EffectuerTransfert(size, indice, infostableau);
-			system("cls");
-			AfficherSolde(indice, infostableau);
+			nSolde = EffectuerTransfert(size, indice, infostableau);
+			historique[nTransaction].type = Type::Transfert;
+			historique[nTransaction].solde = nSolde;
+			break;
 
 		case 5:
+			AfficherHistorique(nTransaction, historique);
 			break;
 
 		case 6:
+			SauvegarderDonnees(size, infostableau);
 			return 0;
 
 		default:
@@ -358,7 +420,8 @@ int main()
 	locale::global(locale("C"));
 
 	ifstream fichier{ "informations.txt" };
-	Compte infostableau[MAX]{};
+	Compte infostableau[MAX]{ };
+	Transaction historique[MAX]{ };
 
 	int inputNC{ 0 };
 	int inputNIP{ 0 };
@@ -378,6 +441,7 @@ int main()
 	}
 	while (ConnecterJoueur(size, indice, inputNC, inputNIP, infostableau) == false);
 
+	int nTransaction{ };
 	int choix{ };
 	do
 	{
@@ -385,9 +449,10 @@ int main()
 		cin >> choix;
 		system("cls");
 
-		TraiterChoix(size, indice, inputNC, choix, infostableau);
+		ExecuterOperations(size, indice, inputNC, choix, nTransaction, historique, infostableau);
 		system("pause");
 		system("cls");
+		nTransaction++;
 	}
 	while (choix != 6);
 	
