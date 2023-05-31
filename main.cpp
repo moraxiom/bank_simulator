@@ -2,6 +2,7 @@
 #include <clocale>
 #include <fstream>
 #include <string>
+#include <cctype>
 
 using namespace std;
 const int MAX{ 100 };
@@ -17,7 +18,7 @@ struct Compte
 };
 /* STRUCT */
 
-/* AFFICHAGE */
+/* AFFICHAGE/TRAITEMENT */
 void AfficherAideConnexion()
 {
 	cout << "===============================================" << endl;
@@ -31,6 +32,9 @@ void AfficherAideConnexion()
 	cout << " Votre NIP ne correspond pas au NIP de" << endl;
 	cout << " votre compte!" << endl;
 	cout << endl;
+
+	system("pause");
+	system("cls");
 }
 
 void AfficherAideFormat()
@@ -45,6 +49,9 @@ void AfficherAideFormat()
 	cout << " # : 6 CHIFFRES" << endl;
 	cout << " NIP : 5 CHIFFRES" << endl;
 	cout << endl;
+
+	system("pause");
+	system("cls");
 }
 
 void AfficherBarreConnexion()
@@ -62,16 +69,18 @@ void AfficherBarreValidation()
 	cout << "|            VALIDATION EN COURS...           |" << endl;
 	cout << "===============================================" << endl;
 	cout << endl;
-	cout << endl;
 	system("pause");
 	system("cls");
 }
 
-void AfficherMenu()
+void AfficherMenu(int& indice, Compte infostableau[])
 {
 	cout << "===============================================" << endl;
 	cout << "|                BANQUE SNYDER                |" << endl;
 	cout << "===============================================" << endl;
+	cout << endl;
+	cout << " Bienvenue, " << infostableau[indice].prenom << " " << infostableau[indice].nom << " !" << endl;
+	cout << " Voici vos options : " << endl;
 	cout << endl;
 	cout << " [1] - Afficher le solde du compte" << endl;
 	cout << " [2] - Effectuer un retrait" << endl;
@@ -81,9 +90,44 @@ void AfficherMenu()
 	cout << " [6] - QUITTER" << endl;
 	cout << endl;
 }
-/* AFFICHAGE */
 
-/* INT */
+void AfficherSolde(int& indice, Compte infostableau[])
+{
+	cout << "===============================================" << endl;
+	cout << "|                VOTRE SOLDE!                 |" << endl;
+	cout << "===============================================" << endl;
+	cout << endl;
+	cout << " Vous avez " << infostableau[indice].solde << "$ dans votre compte." << endl;
+	cout << endl;
+
+	system("pause");
+	system("cls");
+}
+
+void AfficherBarreRetrait()
+{
+	cout << "===============================================" << endl;
+	cout << "|            EFFECTUER UN RETRAIT?            |" << endl;
+	cout << "===============================================" << endl;
+	cout << endl;
+}
+
+void AfficherBarreDepot()
+{
+	cout << "===============================================" << endl;
+	cout << "|             EFFECTUER UN DEPOT?             |" << endl;
+	cout << "===============================================" << endl;
+	cout << endl;
+}
+
+void AfficherBarreTransfert()
+{
+	cout << "===============================================" << endl;
+	cout << "|           EFFECTUER UN TRANSFERT?           |" << endl;
+	cout << "===============================================" << endl;
+	cout << endl;
+}
+
 int Taille()
 {
 	ifstream fichier("informations.txt");
@@ -122,10 +166,10 @@ int CreerTableau(int size, Compte infostableau[])
 	return 0;
 }
 
-int RechercherCompte(int size, int& inputNC, int& inputNIP, Compte infostableau[])
+int RechercherCompte(int size, int inputNC, Compte infostableau[])
 {
 	int g{ 0 };
-	int d{ size - 1 };
+	int d{ size };
 	int milieu{ };
 
 	while (g <= d)
@@ -135,7 +179,7 @@ int RechercherCompte(int size, int& inputNC, int& inputNIP, Compte infostableau[
 		{
 			return milieu;
 		}
-		else if (infostableau[milieu].nCompte > g)
+		else if (infostableau[milieu].nCompte < inputNC)
 		{
 			g = milieu + 1;
 		}
@@ -144,24 +188,114 @@ int RechercherCompte(int size, int& inputNC, int& inputNIP, Compte infostableau[
 			d = milieu - 1;
 		}
 	}
-	return -1;
-}
-/* INT */
-
-int CompterChiffres()
-{
-
+	return -2;
 }
 
-/* BOOL */
-bool ValiderInput(int size, int indice, int& inputNC, int& inputNIP, Compte infostableau[])
+float EffectuerRetrait(int& indice, Compte infostableau[])
 {
-	return true;
+	float retrait{ 0.0f };
+	cout << " Retirer au compte : ";
+	cin >> retrait;
+
+	return (infostableau[indice].solde - retrait);
 }
 
-bool ValiderInformations(int indice, int& inputNIP, Compte infostableau[])
+float EffectuerDepot(int& indice, Compte infostableau[])
 {
-	if (indice == -1)
+	float depot{ 0.0f };
+	cout << " Ajouter au compte : ";
+	cin >> depot;
+
+	return (infostableau[indice].solde + depot);
+}
+
+bool ValiderInputCompte(int inputNC)
+{
+	string n1{ to_string(inputNC) };
+
+	if (n1.size() != 6)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
+
+int TrouverIndiceReceveur(int size, int& indice, Compte infostableau[])
+{
+	int inputNC{ };
+	int n{ };
+	do
+	{
+		cout << " # de compte du receveur : ";
+		cin >> inputNC;
+		n = RechercherCompte(size, inputNC, infostableau);
+		system("cls");
+
+	} while (ValiderInputCompte(inputNC) == false || n == -2);
+
+	return n;
+}
+
+int TraiterChoix(int size, int& indice, int inputNC, int choix, Compte infostableau[])
+{
+	AfficherMenu(indice, infostableau);
+	cin >> choix;
+	system("cls");
+
+	float nSolde{ };
+	float nSoldeRec{ };
+	int nRec{ };
+
+	switch (choix)
+	{
+		case 1:
+			AfficherSolde(indice, infostableau);
+			system("pause");
+			system("cls");
+			break;
+
+		case 2:
+			AfficherBarreRetrait();
+			nSolde = EffectuerRetrait(indice, infostableau);
+			infostableau[indice].solde = nSolde;
+			break;
+
+
+		case 3:
+			AfficherBarreDepot();
+			nSolde = EffectuerDepot(indice, infostableau);
+			infostableau[indice].solde = nSolde;
+			break;
+
+		case 4:
+			AfficherBarreTransfert();
+			nRec = TrouverIndiceReceveur(size, indice, infostableau);
+
+		default:
+			return -3;
+	}
+}
+
+bool ValiderInputNIP(int& inputNIP)
+{
+	string n2{ to_string(inputNIP) };
+
+	if (n2.size() != 5)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
+
+bool ValiderInformations(int& indice, int& inputNIP, Compte infostableau[])
+{
+	if (indice == -2)
 	{
 		return false;
 	}
@@ -178,28 +312,21 @@ bool ValiderInformations(int indice, int& inputNIP, Compte infostableau[])
 	}
 }
 
-bool ConnecterJoueur(int size, int indice, int& inputNC, int& inputNIP, Compte infostableau[])
+bool ConnecterJoueur(int size, int& indice, int inputNC, int& inputNIP, Compte infostableau[])
 {
-	indice = RechercherCompte(size, inputNC, inputNIP, infostableau);
-	bool b1{ ValiderInput(size, indice, inputNC, inputNIP, infostableau) };
-	bool b2{ ValiderInformations(indice, inputNIP, infostableau) };
-
-	if (b1 == false)
+	indice = RechercherCompte(size, inputNC, infostableau);
+	if ((ValiderInputCompte(inputNC) == false) || (ValiderInputNIP(inputNIP) == false))
 	{
 		AfficherAideFormat();
 		return false;
 	}
-	else if (b2 == false)
+	else if (ValiderInformations(indice, inputNIP, infostableau) == false)
 	{
 		AfficherAideConnexion();
 		return false;
 	}
-	else
-	{ 
-		return true;
-	}
+	return true;
 }
-/* BOOL */
 
 int main()
 {
@@ -213,6 +340,8 @@ int main()
 	int size{ Taille() };
 	int indice{ };
 
+	CreerTableau(size, infostableau);
+
 	do
 	{
 		AfficherBarreConnexion();
@@ -221,19 +350,19 @@ int main()
 		cout << "      NIP : ";
 		cin >> inputNIP;
 		AfficherBarreValidation();
-
-		CreerTableau(size, infostableau);
-		ConnecterJoueur(size, indice, inputNC, inputNIP, infostableau);
 	}
 	while (ConnecterJoueur(size, indice, inputNC, inputNIP, infostableau) == false);
 
-	AfficherMenu();
 	int choix{ };
-	cin >> choix;
-
-	switch (choix)
+	do
 	{
-	}
+		AfficherMenu(indice, infostableau);
+		cin >> choix;
+		system("cls");
 
+		TraiterChoix(size, indice, inputNC, choix, infostableau);
+	}
+	while (choix != 6);
+	
 	return 0;
 }

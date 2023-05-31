@@ -1,7 +1,6 @@
 Stephane Duguay	424242	54321	70.67
-Matthieu Belanger-P.	476246	77649	19.84
-Angelica Lepage	905489	43857	100.94
+Matthieu Belanger	476246	77649	19.84
 Benjamin Hebert	648954	32879	95.87
-Alexandra Deschênes	696984	22324	121.43
-Iris Boucher-Rosello	132455	85600	145.75
+Alexandra Deschenes	696984	22324	121.43
 Leila Dufour	777432	54658	169.81
+Angelica Lepage	905489	43857	100.94
