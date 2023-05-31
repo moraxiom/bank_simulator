@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include <cctype>
+#include <chrono>
 
 using namespace std;
 const int MAX{ 100 };
@@ -232,11 +233,27 @@ int TrouverIndiceReceveur(int size, int& indice, Compte infostableau[])
 		cout << " # de compte du receveur : ";
 		cin >> inputNC;
 		n = RechercherCompte(size, inputNC, infostableau);
-		system("cls");
 
 	} while (ValiderInputCompte(inputNC) == false || n == -2);
 
 	return n;
+}
+
+void EffectuerTransfert(int size, int& indice, Compte infostableau[])
+{
+	float nSolde{ };
+	float nSoldeRec{ };
+	int nRec{ };
+	float somme{ 0.0f };
+
+	nRec = TrouverIndiceReceveur(size, indice, infostableau);
+	cout << " Montant a transferer : ";
+	cin >> somme;
+
+	nSolde = (infostableau[indice].solde - somme);
+	infostableau[indice].solde = nSolde;
+	nSoldeRec = (infostableau[nRec].solde + somme);
+	infostableau[nRec].solde = nSoldeRec;
 }
 
 int TraiterChoix(int size, int& indice, int inputNC, int choix, Compte infostableau[])
@@ -246,21 +263,19 @@ int TraiterChoix(int size, int& indice, int inputNC, int choix, Compte infostabl
 	system("cls");
 
 	float nSolde{ };
-	float nSoldeRec{ };
-	int nRec{ };
 
 	switch (choix)
 	{
 		case 1:
 			AfficherSolde(indice, infostableau);
-			system("pause");
-			system("cls");
 			break;
 
 		case 2:
 			AfficherBarreRetrait();
 			nSolde = EffectuerRetrait(indice, infostableau);
 			infostableau[indice].solde = nSolde;
+			system("cls");
+			AfficherSolde(indice, infostableau);
 			break;
 
 
@@ -268,11 +283,21 @@ int TraiterChoix(int size, int& indice, int inputNC, int choix, Compte infostabl
 			AfficherBarreDepot();
 			nSolde = EffectuerDepot(indice, infostableau);
 			infostableau[indice].solde = nSolde;
+			system("cls");
+			AfficherSolde(indice, infostableau);
 			break;
 
 		case 4:
 			AfficherBarreTransfert();
-			nRec = TrouverIndiceReceveur(size, indice, infostableau);
+			EffectuerTransfert(size, indice, infostableau);
+			system("cls");
+			AfficherSolde(indice, infostableau);
+
+		case 5:
+			break;
+
+		case 6:
+			return 0;
 
 		default:
 			return -3;
@@ -361,6 +386,8 @@ int main()
 		system("cls");
 
 		TraiterChoix(size, indice, inputNC, choix, infostableau);
+		system("pause");
+		system("cls");
 	}
 	while (choix != 6);
 	
